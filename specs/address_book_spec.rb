@@ -35,4 +35,11 @@ RSpec.describe AddressBook do
     end
   end
 
+  context '#remove_entry' do
+    it "removes a specific entry by email" do
+      @book.remove_entry('augusta.king@lovelace.com')
+      expect(@book.entries.size).to eql(0)
+    end
+  end
+
 end
