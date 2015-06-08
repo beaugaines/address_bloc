@@ -38,7 +38,7 @@ class MenuController
       main_menu
     when 5
       system 'clear'
-      find_user_by_number
+      find_user_by_position
     when 6
       puts "Good-bye!"
       exit(0)
@@ -101,6 +101,23 @@ class MenuController
       entries_submenu(entry)
     end
   end
+
+  def find_user_by_position
+    system 'clear'
+    puts "Enter the position of the user: "
+    position = gets.chomp.to_i
+    user = @address_book.entries[position]
+    if user.nil?
+      puts 'No results found'
+    else
+      puts "Results:  #{user.to_s}"
+    end
+    puts 'Hit enter to return to main menu'
+    while keystroke = gets
+      main_menu if keystroke == "\n"
+    end
+  end
+  
   
  
   def search_entries
