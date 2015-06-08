@@ -118,8 +118,6 @@ class MenuController
     end
   end
   
-  
- 
   def search_entries
   end
  
