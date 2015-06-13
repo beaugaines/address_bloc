@@ -107,4 +107,25 @@ RSpec.describe AddressBook do
     end
   end
 
+  context '#iterative_search' do
+    it 'searches for a non-existent entry' do
+      book.import_from_csv('entries.csv')
+      entry = book.iterative_search('Clive')
+      expect(entry).to be_nil
+    end
+
+    it 'searches for an existent entry' do
+      book.import_from_csv('entries.csv')
+      entry = book.iterative_search('Bob')
+      expect(entry.instance_of?(Entry))
+      check_entry(entry, 'Bob', '555-555-5555', 'bob@blocmail.com')
+    end
+
+    it 'searches for an entry that appears suspiciously similar to an existant entry' do
+      book.import_from_csv('entries.csv')
+      entry = book.iterative_search('Bobb')
+      expect(entry).to be_nil
+    end
+  end
+
 end
