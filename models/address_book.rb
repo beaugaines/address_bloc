@@ -5,6 +5,8 @@ require 'pstore'
 class AddressBook
   attr_accessor :entries
 
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+
   def initialize(store: 'data.pstore')
     @entries = PStore.new(store)
   end
@@ -15,7 +17,11 @@ class AddressBook
 
   def find(email)
     entries.transaction do
-      entries.fetch(email, 'No records found')
+      if entry = entries[email]
+        entry
+      else
+        false
+      end
     end
   end
 

@@ -54,7 +54,7 @@ RSpec.describe AddressBook do
       book.create('Ada Lovelace', '010.012.1815', 'augusta.king@lovelace.com')
     end
 
-    it "removes a specific entry" do
+    it "updates a specific entry" do
       entry = book.find('augusta.king@lovelace.com')
       book.update(entry, 'Ada Lovelace', '010.012.1815', 'augusta@gmail.com')
 
@@ -67,7 +67,7 @@ RSpec.describe AddressBook do
     before do
       book.create('Ada Lovelace', '010.012.1815', 'augusta.king@lovelace.com')
     end
-    
+
     it "removes a specific entry" do
       entry = book.find('augusta.king@lovelace.com')
       book.destroy(entry)
@@ -111,23 +111,23 @@ RSpec.describe AddressBook do
   end
 
   context '#find' do
-    it 'searches for a non-existent entry' do
+    it 'returns false for a non-existent entry' do
       book.import_from_csv('entries.csv')
-      entry = book.find('guy@glocmail.com')
-      expect(entry).to eql('No records found')
+      result = book.find('guy@glocmail.com')
+      expect(result).to eql(false)
     end
 
-    it 'searches for an existent entry' do
+    it 'returns an existent entry' do
       book.import_from_csv('entries.csv')
       entry = book.find('bob@blocmail.com')
       expect(entry.instance_of?(Entry))
       check_entry(entry, 'Bob', '555-555-5555', 'bob@blocmail.com')
     end
 
-    it 'searches for an entry that appears suspiciously similar to an existant entry' do
+    it 'returns false for an entry that appears suspiciously similar to an existant entry' do
       book.import_from_csv('entries.csv')
       result = book.find('Bobb')
-      expect(result).to eql('No records found')
+      expect(result).to eql(false)
     end
   end
 
