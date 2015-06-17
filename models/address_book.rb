@@ -5,8 +5,6 @@ require 'pstore'
 class AddressBook
   attr_accessor :entries
 
-  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
-
   def initialize(store: 'data.pstore')
     @entries = PStore.new(store)
   end
