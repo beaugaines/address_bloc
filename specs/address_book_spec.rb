@@ -1,3 +1,4 @@
+require_relative './spec_helper'
 require_relative '../models/address_book'
 
 RSpec.describe AddressBook do
@@ -30,6 +31,7 @@ RSpec.describe AddressBook do
   end
 
   context '#create' do
+
     before do
       book.create('Ada Lovelace', '010.012.1815', 'augusta.king@lovelace.com')
     end
@@ -46,7 +48,26 @@ RSpec.describe AddressBook do
     end
   end
 
+  context '#update' do
+
+    before do
+      book.create('Ada Lovelace', '010.012.1815', 'augusta.king@lovelace.com')
+    end
+
+    it "removes a specific entry" do
+      entry = book.find('augusta.king@lovelace.com')
+      book.update(entry, 'Ada Lovelace', '010.012.1815', 'augusta@gmail.com')
+
+      expect(book.find('augusta@gmail.com').email).to eql('augusta@gmail.com')
+    end
+  end
+
   context '#destroy' do
+
+    before do
+      book.create('Ada Lovelace', '010.012.1815', 'augusta.king@lovelace.com')
+    end
+    
     it "removes a specific entry" do
       entry = book.find('augusta.king@lovelace.com')
       book.destroy(entry)

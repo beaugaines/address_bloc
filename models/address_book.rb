@@ -22,27 +22,24 @@ class AddressBook
   def create(name, phone, email)
     entries.transaction do
       if entries[email] = Entry.new(name, phone, email)
-        puts "New record added to list for #{email}"
+        puts "New record added to list: #{email}"
+        true
       else
         puts 'There was an error creating your record'
+        false
       end
     end
   end
 
-  def update(entry)
-    entries.transaction do
-      if record = entries[entry.email]
-        entries[entry.email] = entry
-      else
-        puts "No record found"
-      end
-    end
+  def update(entry, name, phone, email)
+    destroy(entry) && create(name, phone, email)
   end
 
   def destroy(entry)
     entries.transaction do
-      if entries.delete(entry)
+      if entries.delete(entry.email)
         puts "#{entry} deleted from list"
+        true
       end
     end
   end
