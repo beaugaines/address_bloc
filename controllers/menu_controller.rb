@@ -9,7 +9,7 @@ class MenuController
 
   def main_menu
     system 'clear'
-    puts "Main Menu - #{@address_book.entries.count} entries"
+    puts "Main Menu - #{address_book.entry_count} entries"
     puts "1 - View all entries"
     puts "2 - Create an entry"
     puts "3 - Search for an entry"
@@ -54,7 +54,7 @@ class MenuController
   end
 
   def view_all_entries
-    @address_book.entries.each do |entry|
+    @address_book.all.each do |entry|
       system 'clear'
       puts entry.to_s
       entry_submenu(entry)
@@ -77,7 +77,7 @@ class MenuController
     print 'Email: '
     email = gets.chomp
 
-    @address_book.add_entry(name, phone, email)
+    @address_book.create(name, phone, email)
 
     system 'clear'
     puts "New entry created"
@@ -108,26 +108,10 @@ class MenuController
     end
   end
 
-  def find_user_by_position
-    system 'clear'
-    puts "Enter the position of the user: "
-    position = gets.chomp.to_i
-    user = @address_book.entries[position]
-    if user.nil?
-      puts 'No results found'
-    else
-      puts "Results:  #{user.to_s}"
-    end
-    puts 'Hit enter to return to main menu'
-    while keystroke = gets
-      main_menu if keystroke == "\n"
-    end
-  end
-  
   def search_entries
     print 'Search by name: '
     query = gets.chomp
-    result = @address_book.iterative_search(query)
+    result = @address_book.find(query)
     system 'clear'
     if result
       puts "Result: #{result.to_s}"
@@ -190,16 +174,20 @@ class MenuController
   end
 
   def delete_entry(entry_name)
-    @address_book.entries.delete(entry_name)
-    puts "#{entry_name} has been deleted"
+    system 'clear'
+    if address_book.destroy(entry_name)
+      puts "#{entry_name} has been deleted"
+    else
+      puts 'Entry not found'
+    end
   end
 
-  def detonate(entry=nil)
+  def detonate
     system 'clear'
     print 'Do you really want to destroy all entries?  Enter y/Y to confirm'
     response = gets.chomp
     if %w(y Y).include?(response)
-      @address_book.entries.each { |e| delete_entry(e) }
+      @address_book.all.each { |e| delete_entry(e) }
       system 'clear'
       print 'Detonated!'
       sleep(2)
@@ -211,7 +199,7 @@ class MenuController
         system 'clear'
         main_menu
       else
-        detonate(response)
+        detonate
       end
     end
   end

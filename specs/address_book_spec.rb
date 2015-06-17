@@ -1,5 +1,6 @@
 RSpec.describe AddressBook do
 
+  require_relative '../models/address_book'
   # before do
   #   book = AddressBook.new
   # end
