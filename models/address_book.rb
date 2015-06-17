@@ -5,8 +5,8 @@ require 'pstore'
 class AddressBook
   attr_accessor :entries
 
-  def initialize
-    @entries = PStore.new('data.pstore')
+  def initialize(store: 'data.pstore')
+    @entries = PStore.new(store)
   end
 
   def all
@@ -43,6 +43,15 @@ class AddressBook
     entries.transaction do
       if entries.delete(entry)
         puts "#{entry} deleted from list"
+      end
+    end
+  end
+
+  def destroy_all
+    entries.transaction do
+      entries.roots.each { |e| entries.delete(e) }
+      if entries.roots.count == 0
+        puts 'All items destroyed'
       end
     end
   end

@@ -1,11 +1,12 @@
+require_relative '../models/address_book'
+
 RSpec.describe AddressBook do
 
-  require_relative '../models/address_book'
-  # before do
-  #   book = AddressBook.new
-  # end
+  let(:book) { AddressBook.new(store: 'test.pstore') }
 
-  let(:book) { AddressBook.new }
+  before do
+    book.destroy_all
+  end
 
   # helper methods
   def check_entry(entry, expected_name, expected_number, expected_email)
@@ -20,112 +21,92 @@ RSpec.describe AddressBook do
     end
 
     it 'initializes entries as an array' do
-      expect(book.entries).to be_a(Array)
+      expect(book.entries).to be_an_instance_of(PStore)
     end
 
     it 'initializes entries as empty' do
-      expect(book.entries.size).to eql(0)
+      expect(book.entry_count).to eql(0)
     end
   end
 
-  context '#add_entry' do
+  context '#create' do
     before do
-      book.add_entry('Ada Lovelace', '010.012.1815', 'augusta.king@lovelace.com')
+      book.create('Ada Lovelace', '010.012.1815', 'augusta.king@lovelace.com')
     end
 
     it 'adds only one entry to address book' do
-      expect(book.entries.size).to eql(1)
+      expect(book.entry_count).to eql(1)
     end
 
     it 'adds the correct info to entries' do
-      new_entry = book.entries[0]
+      new_entry = book.find('augusta.king@lovelace.com')
       expect(new_entry.name).eql? 'Ada Lovelace'
       expect(new_entry.phone_number).eql? '010.012.1815'
       expect(new_entry.email).eql? 'augusta.king@lovelace.com'
     end
   end
 
-  context '#remove_entry' do
+  context '#destroy' do
     it "removes a specific entry" do
-      book.remove_entry(book.entries[0])
-      expect(book.entries.size).to eql(0)
+      entry = book.find('augusta.king@lovelace.com')
+      book.destroy(entry)
+      expect(book.entry_count).to eql(0)
     end
   end
 
   context '#import_from_csv' do
     it 'imports the correct number of entries' do
       book.import_from_csv('entries.csv')
-      book_size = book.entries.size
+      book_size = book.entry_count
       expect(book_size).to eql 5
     end
 
     it 'imports the first entry' do
       book.import_from_csv('entries.csv')
-      first_entry = book.entries[0]
+      entry_one = book.find('bill@blocmail.com')
 
-      check_entry(first_entry, 'Bill', '555-555-5555', 'bill@blocmail.com')
+      check_entry(entry_one, 'Bill', '555-555-5555', 'bill@blocmail.com')
     end
 
     it "imports the 2nd entry" do
       book.import_from_csv("entries.csv")
-      entry_two = book.entries[1]
+      entry_two = book.find('bob@blocmail.com')
 
       check_entry(entry_two, 'Bob', '555-555-5555', 'bob@blocmail.com')
     end
 
     it "imports the 3rd entry" do
       book.import_from_csv("entries.csv")
-      entry_three = book.entries[2]
+      entry_three = book.find('joe@blocmail.com')
 
       check_entry(entry_three, 'Joe', '555-555-5555', 'joe@blocmail.com')
     end
 
     it 'imports from a second csv data source' do
       book.import_from_csv('entries2.csv')
-      book_size = book.entries.size
+      book_size = book.entry_count
       expect(book_size).to eql 3
     end
   end
 
-  context '#binary_search' do
+  context '#find' do
     it 'searches for a non-existent entry' do
       book.import_from_csv('entries.csv')
-      entry = book.binary_search('Clive')
-      expect(entry).to be_nil
+      entry = book.find('guy@glocmail.com')
+      expect(entry).to eql('No records found')
     end
 
     it 'searches for an existent entry' do
       book.import_from_csv('entries.csv')
-      entry = book.binary_search('Bob')
+      entry = book.find('bob@blocmail.com')
       expect(entry.instance_of?(Entry))
       check_entry(entry, 'Bob', '555-555-5555', 'bob@blocmail.com')
     end
 
     it 'searches for an entry that appears suspiciously similar to an existant entry' do
       book.import_from_csv('entries.csv')
-      entry = book.binary_search('Bobb')
-      expect(entry).to be_nil
-    end
-  end
-
-  context '#iterative_search' do
-    it 'searches for a non-existent entry' do
-      book.import_from_csv('entries.csv')
-      entry = book.iterative_search('Clive')
-      expect(entry).to be_nil
-    end
-
-    it 'searches for an existent entry' do
-      book.import_from_csv('entries.csv')
-      entry = book.iterative_search('Bob')
-      expect(entry.instance_of?(Entry))
-      check_entry(entry, 'Bob', '555-555-5555', 'bob@blocmail.com')
-    end
-
-    it 'searches for an entry that appears suspiciously similar to an existant entry' do
-      book.import_from_csv('entries.csv')
-      entry = book.iterative_search('Bobb')
-      expect(entry).to be_nil
+      result = book.find('Bobb')
+      expect(result).to eql('No records found')
     end
   end
 
